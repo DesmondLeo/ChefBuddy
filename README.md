@@ -1,3 +1,8 @@
+# ABOUT THIS APP
+One of the biggest and most time consuming problems with meal planning is writing down all the ingredients you need to buy for a meal.  this problem is made worse when you are planning a weekly shop and need to aggregate the ingredients for multiple recipes.
+
+This code is designed to simplify aggregating recipe ingredients to create one single shopping list. If you see a recipe you like either online or in a cookbook, all you need to do is provide the link to the recipe or an image of the recipe.  this program will scrape the text from either the website or the image and use chatGPT to extract the ingredients required to make the recipe.  you can add as many recipes as you want.  Once you are finished - the code will aggregate all the ingredients together to create one singular shopping list that you can copy and paste into your notebook.
+
 # Python Notes
 
 **The following Python libraries must be installed on your local device before running the program:**
