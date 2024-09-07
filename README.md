@@ -1,7 +1,7 @@
 # ABOUT THIS APP
-One of the biggest and most time consuming problems with meal planning is writing down all the ingredients you need to buy for a meal.  this problem is made worse when you are planning a weekly shop and need to aggregate the ingredients for multiple recipes.
+Meal planning can be a hassle, especially when it comes to writing down all the ingredients you need for each meal. This becomes even more time-consuming when planning a weekly shop and needing to combine ingredients from multiple recipes.
 
-This code is designed to simplify aggregating recipe ingredients to create one single shopping list. If you see a recipe you like either online or in a cookbook, all you need to do is provide the link to the recipe or an image of the recipe.  this program will scrape the text from either the website or the image and use chatGPT to extract the ingredients required to make the recipe.  you can add as many recipes as you want.  Once you are finished - the code will aggregate all the ingredients together to create one singular shopping list that you can copy and paste into your notebook.
+ChefBuddy is designed to make this process easier by automatically gathering ingredients from your chosen recipes into one unified shopping list. Simply provide a link to an online recipe or upload an image of a recipe from a cookbook. ChefBuddy will extract the text from the source, identify the ingredients using advanced AI, and allow you to add as many recipes as you like. When you're done, it combines all the ingredients into a single shopping list, ready for you to copy and use.
 
 # Python Notes
 
