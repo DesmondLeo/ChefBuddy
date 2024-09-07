@@ -54,7 +54,9 @@ Future improvements to the application will likely also surpass the rate-per-min
 
 # Next Improvements for MVP Release
 
-- Allowing for an intermediary step to adjust individual recipe quantities before storing in a shopping list in case some recipes are for too many (or not enough) people.
+- split scraped content into 3 categories - ingredients, instructions, preparation details (e.g. time to cook & how many to the meal is for)
+- split send_recipe_to_openai into 3 separate calls, one to capture ingredients, one to capture instructions, and one to capture preparation details
+- Build an intermediary step allowing the user to adjust individual recipe quantities based on number of people the meal is for.
 - Developing a GUI / Webapp using Bubble.io (this will be final step for MVP...probably).
 
 # Future Considerations
