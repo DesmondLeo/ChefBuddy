@@ -37,8 +37,9 @@ Future improvements to the application will likely also surpass the rate-per-min
 
 4. **Follow the instructions in the terminal, and that's it!**
 
-**Note:** If you're going to take an image of a recipe to use with this app, make sure to make the name of the image the name of the recipe with underscores separating the words such as cacio_e_pepe.jpg.  The program automatically removes the underscores and will name the recipe accordingly
-**Note:** When providing an HTML link, make sure to include the entire address such as: https://chejorge.com/2020/07/24/vegan-dan-dan-noodles/
+**Note 1:** If you're going to take an image of a recipe to use with this app, make sure to make the name of the image the name of the recipe with underscores separating the words such as cacio_e_pepe.jpg.  The program automatically removes the underscores and will name the recipe accordingly
+
+**Note 2:** When providing an HTML link, make sure to include the entire address such as: https://chejorge.com/2020/07/24/vegan-dan-dan-noodles/
 
 # Next Improvements for MVP Release
 
