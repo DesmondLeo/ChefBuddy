@@ -18,6 +18,7 @@ ChefBuddy is designed to make this process easier by automatically gathering ing
 - `pytesseract`
 - `Pillow` (for `Image`)
 - `python-dotenv` (for `dotenv`)
+- `anthropic` 
 
 # OpenAI Notes
 

@@ -6,7 +6,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 def scrape_with_beautifulsoup(url, return_filepath=False):
-    print(f"Attempting to scrape {url} for ingredients using beautifulsoup.")
+    print(f"Attempting to scrape {url} for ingredients using BeautifulSoup.")
     save_path = None
     try:
         # Add headers to mimic a browser
@@ -66,6 +66,9 @@ def scrape_with_beautifulsoup(url, return_filepath=False):
         if not text_content.strip():
             text_content = "NO TEXT FOUND"
 
+        # Clean up extra new lines in the text content
+        text_content = '\n'.join([line for line in text_content.splitlines() if line.strip()])
+
         # Get the root directory of the application (the directory where this script is located)
         root_directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -79,11 +82,25 @@ def scrape_with_beautifulsoup(url, return_filepath=False):
         # Define the full path where the file will be saved in the 'temp' folder
         save_path = os.path.join(temp_folder_path, filename)
 
-        # Save the text content to the file
+        # Save the cleaned text content to the file
         with open(save_path, 'w', encoding='utf-8') as file:
             file.write(text_content)
 
         print(f"Recipe sections successfully saved to {save_path}")
+
+        # Save the full text content of the webpage in a new file with "_fullextract" appended
+        full_extract_filename = os.path.splitext(filename)[0] + '_fullextract.txt'
+        full_extract_path = os.path.join(temp_folder_path, full_extract_filename)
+
+        # Get the full text of the webpage and clean it up
+        full_text_content = soup.get_text(separator='\n').strip()
+        full_text_content = '\n'.join([line for line in full_text_content.splitlines() if line.strip()])
+
+        # Save the cleaned full text content to the new file
+        with open(full_extract_path, 'w', encoding='utf-8') as full_file:
+            full_file.write(full_text_content)
+
+        print(f"Full webpage content successfully saved to {full_extract_path}")
 
     except requests.exceptions.RequestException as e:
         print(f"Error occurred during the request: {e}")
@@ -99,7 +116,7 @@ def scrape_with_beautifulsoup(url, return_filepath=False):
         save_path = handle_no_text_found(url)
     
     if return_filepath:
-        return(save_path)
+        return save_path
 
 def handle_no_text_found(url):
     """Handle saving 'NO TEXT FOUND' when an error occurs."""
@@ -130,4 +147,4 @@ def handle_no_text_found(url):
     return save_path
 
 # Example usage:
-# scrape_and_save_beautifulsoup('https://chejorge.com/2020/07/24/vegan-dan-dan-noodles/')
+# scrape_with_beautifulsoup('https://chejorge.com/2020/07/24/vegan-dan-dan-noodles/')

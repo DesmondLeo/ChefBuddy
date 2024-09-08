@@ -33,17 +33,24 @@ def main():
     while True:
         # Get and process the initial recipe input
         recipe_input = process_recipe.get_recipe_input()
-        process_recipe.process_recipe(recipe_input)
+
+        # Check if recipe_input is valid (not None or empty)
+        if recipe_input:
+            process_recipe.process_recipe(recipe_input)
+        else:
+            print("No input provided. Continuing with remaining steps.")
+            break
 
         # Ask if the user wants to add another recipe or continue
-        next_action = input("If you would like to add another recipe, please enter it now. Otherwise, hit Enter to continue:\n")
-        
+        next_action = input("\nIf you would like to add another recipe, please enter it now. Otherwise, hit Enter to continue:\n")
+
         # If the user hits Enter without inputting anything, break the loop
         if not next_action.strip():
             break
         
         # Otherwise, process the next recipe input
-        process_recipe.process_recipe(next_action)
+        if next_action:
+            process_recipe.process_recipe(next_action)
 
     # Call the function to create a shopping list once the loop ends
     print("Creating shopping list...")
