@@ -3,6 +3,9 @@ Meal planning can be a hassle, especially when it comes to writing down all the 
 
 ChefBuddy is designed to make this process easier by automatically gathering ingredients from your chosen recipes into one unified shopping list. Simply provide a link to an online recipe or upload an image of a recipe from a cookbook. ChefBuddy will extract the text from the source, identify the ingredients using advanced AI, and allow you to add as many recipes as you like. When you're done, it combines all the ingredients into a single shopping list, ready for you to copy and use.
 
+# TRY THIS CODE YOURSELF!
+Currently this is a work-in-progress POC.  It works - though like all things it can be improved.  Right now it is only accessible via a command line interface, but the goal is to eventually turn this into a full GUI-enabled webapp built with bubble.io.  Follow the instructions if you want to try out the CLI today, or check back later to try the MVP webapp.
+
 # Python Notes
 
 **The following Python libraries must be installed on your local device before running the program:**
@@ -24,7 +27,7 @@ ChefBuddy is designed to make this process easier by automatically gathering ing
 
 **This application requires a paid tier of OpenAI because it uses the GPT-4 model.**
 
-Future improvements to the application will likely also surpass the rate-per-minute limits of the free model, so you need to use the paid model.
+Future improvements to the application will likely also surpass the rate-per-minute limits of the free model, so you need to use the paid model.  I'm also exploring using Anthropic as their context window is larger meaning fewer calls need to be made.
 
 # Running Instructions
 
@@ -55,10 +58,9 @@ Future improvements to the application will likely also surpass the rate-per-min
 
 # Next Improvements for MVP Release
 
-- split scraped content into 3 categories - ingredients, instructions, preparation details (e.g. time to cook & how many to the meal is for)
-- split send_recipe_to_openai into 3 separate calls, one to capture ingredients, one to capture instructions, and one to capture preparation details
-- Build an intermediary step allowing the user to adjust individual recipe quantities based on number of people the meal is for.
-- Developing a GUI / Webapp using Bubble.io (this will be final step for MVP...probably).
+- enhance prompt to remove redundancies and minor LLM response inconsistencies
+- allow for recipe adjustments / portion size adjustements
+- Developing a GUI / Webapp using Bubble.io
 
 # Future Considerations
 
