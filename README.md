@@ -59,7 +59,7 @@ Future improvements to the application will likely also surpass the rate-per-min
 # Next Improvements for MVP Release
 
 - enhance prompt to remove redundancies and minor LLM response inconsistencies
-- allow for recipe adjustments / portion size adjustements
+~~- allow for recipe adjustments / portion size adjustements~~
 - Developing a GUI / Webapp using Bubble.io
 
 # Future Considerations
