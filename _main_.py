@@ -4,6 +4,7 @@ import create_shopping_list
 import send_ingredients_to_openai
 import move_temp_to_trash
 import process_recipe
+from modify_recipe import modify_recipe  # Import modify_recipe correctly
 
 # Get the root directory of the application (the directory where this script is located)
 root_directory = os.path.dirname(os.path.abspath(__file__))
@@ -36,9 +37,20 @@ def main():
 
         # Check if recipe_input is valid (not None or empty)
         if recipe_input:
-            process_recipe.process_recipe(recipe_input)
+            try:
+                # Process the recipe input and get the JSON file path
+                json_file_path = process_recipe.process_recipe(recipe_input)
+                
+                # Modify the recipe JSON file as needed
+                if json_file_path:  # Check if a valid path was returned
+                    modify_recipe(json_file_path)
+                else:
+                    print("No JSON file path returned from process_recipe.")
+            except Exception as e:
+                print(f"Error processing recipe input: {e}")
+                break
         else:
-            print("No input provided. Continuing with remaining steps.")
+            print("No input provided. Exiting.")
             break
 
         # Ask if the user wants to add another recipe or continue
@@ -50,20 +62,34 @@ def main():
         
         # Otherwise, process the next recipe input
         if next_action:
-            process_recipe.process_recipe(next_action)
+            try:
+                json_file_path = process_recipe.process_recipe(next_action)
+                if json_file_path:  # Check if a valid path was returned
+                    modify_recipe(json_file_path)
+                else:
+                    print("No JSON file path returned from process_recipe.")
+            except Exception as e:
+                print(f"Error processing next recipe input: {e}")
+                break
 
     # Call the function to create a shopping list once the loop ends
     print("Creating shopping list...")
-    create_shopping_list.process_and_merge_ingredients(temp_folder_path)
+    try:
+        create_shopping_list.process_and_merge_ingredients(temp_folder_path)
 
-    # Define the input file path for the merged list
-    input_file_path = os.path.join(temp_folder_path, 'mergedlist.json')
+        # Define the input file path for the merged list
+        input_file_path = os.path.join(temp_folder_path, 'mergedlist.json')
 
-    # Send the merged ingredients list to OpenAI using the API key
-    send_ingredients_to_openai.send_ingredients_list_to_openai(input_file_path, api_key)
+        # Send the merged ingredients list to OpenAI using the API key
+        send_ingredients_to_openai.send_ingredients_list_to_openai(input_file_path, api_key)
+    except Exception as e:
+        print(f"Error creating shopping list or sending ingredients: {e}")
 
     # Move temporary files to trash
-    move_temp_to_trash.move_temp_to_trash()
+    try:
+        move_temp_to_trash.move_temp_to_trash()
+    except Exception as e:
+        print(f"Error moving temporary files to trash: {e}")
 
 if __name__ == '__main__':
     main()

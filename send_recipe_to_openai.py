@@ -4,7 +4,18 @@ import re
 import openai
 from dotenv import load_dotenv
 
-def send_recipe_to_openai(file_path, disable_streaming=None):
+def send_recipe_to_openai(file_path, disable_streaming=None, return_json_filepath=False):
+    """
+    Sends recipe content to OpenAI API, processes the response, and optionally returns the JSON file path.
+    
+    Args:
+        file_path (str): The path to the input file (.html or .txt) containing the recipe.
+        disable_streaming (bool, optional): If set, disables streaming response from OpenAI.
+        return_filepath (bool, optional): If True, the function returns the JSON file path.
+        
+    Returns:
+        str or None: Returns the JSON file path if return_filepath is True; otherwise, returns None.
+    """
 
     openai.api_key = os.getenv('OPENAI_API_KEY')
 
@@ -22,7 +33,7 @@ def send_recipe_to_openai(file_path, disable_streaming=None):
     # The base prompt with clear JSON delimiters and instructions
     base_prompt = (
         f"Below is a text extraction from the contents of a website or image. Please extract information from this file following these steps in order:\n"
-        f"1. Identify the recipe name. If the recipe name is not found in the content, use '{recipe_name_from_filename}' as the recipe name.\n"  # Use single quotes here to pass the actual name.
+        f"1. Identify the recipe name. If the recipe name is not found in the content, use '{recipe_name_from_filename}' as the recipe name.\n"
         f"2. Identify each individual ingredient required for the recipe.\n"
         f"3. For each ingredient, only extract the name of the ingredient and remove any preparation instructions associated with them, such as details on how it should be prepared (e.g., chopped, diced) or its purpose (e.g., to make a soup).\n"
         f"4. For each ingredient, standardize the quantity required into one of the following standardized units: teaspoon (tsp), tablespoon (tbsp), cup, fluid ounce (fl oz), milliliter (ml), liter (l), pint (pt), quart (qt), gallon (gal), gram (g), kilogram (kg), ounce (oz), pound (lb), piece, clove, slice, whole, bunch, head, stalk, stick, can, jar, dash, pinch, drop, splash, 'to taste'.\n"
@@ -101,7 +112,7 @@ def send_recipe_to_openai(file_path, disable_streaming=None):
     json_match = re.search(r'\[JSON_START\](.*?)\[JSON_END\]', full_response, re.DOTALL)
     if not json_match:
         print("Failed to locate JSON delimiters in the response.")
-        return
+        return None if return_json_filepath else None
 
     json_content = json_match.group(1).strip()
 
@@ -110,7 +121,7 @@ def send_recipe_to_openai(file_path, disable_streaming=None):
         result_json = json.loads(json_content)
     except json.JSONDecodeError as e:
         print(f"Failed to decode JSON. Error: {e}")
-        return
+        return None if return_json_filepath else None
 
     # If recipeName is empty, use the name from the filename
     if not result_json.get('recipeName') or result_json['recipeName'] == "{{recipe_name_from_filename}}":
@@ -127,9 +138,15 @@ def send_recipe_to_openai(file_path, disable_streaming=None):
 
     print(f"\nJSON content successfully saved to {json_file_path}")
 
+    # Return the JSON file path if requested
+    if return_json_filepath:
+        return json_file_path
+
+    return None
+
 # Example usage:
 # To use streaming:
-# send_recipe_to_openai_api('/path/to/your/file.html', api_key='your_openai_api_key')
+# send_recipe_to_openai('/path/to/your/file.html', disable_streaming=True)
 
-# To disable streaming:
-# send_recipe_to_openai_api('/path/to/your/file.html', api_key='your_openai_api_key', disable_streaming=1)
+# To disable streaming and return JSON file path:
+# json_path = send_recipe_to_openai('/path/to/your/file.html', disable_streaming=True, return_filepath=True)
