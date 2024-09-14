@@ -34,7 +34,7 @@ def modify_recipe(file_path):
     print("Enter 'Done' when finished.")
     
     while True:
-        command = input("Enter the modification you would like to make or type 'Done' to exit: ").strip()
+        command = input("\n\nEnter the modification you would like to make or type 'Done' to exit: ").strip()
         
         if command.lower() == 'done':
             break
