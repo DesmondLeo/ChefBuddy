@@ -11,10 +11,10 @@ def send_recipe_to_openai(file_path, disable_streaming=None, return_json_filepat
     Args:
         file_path (str): The path to the input file (.html or .txt) containing the recipe.
         disable_streaming (bool, optional): If set, disables streaming response from OpenAI.
-        return_filepath (bool, optional): If True, the function returns the JSON file path.
+        return_json_filepath (bool, optional): If True, the function returns the JSON file path.
         
     Returns:
-        str or None: Returns the JSON file path if return_filepath is True; otherwise, returns None.
+        str or None: Returns the JSON file path if return_json_filepath is True; otherwise, returns None.
     """
 
     openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -36,8 +36,12 @@ def send_recipe_to_openai(file_path, disable_streaming=None, return_json_filepat
         f"1. Identify the recipe name. If the recipe name is not found in the content, use '{recipe_name_from_filename}' as the recipe name.\n"
         f"2. Identify each individual ingredient required for the recipe.\n"
         f"3. For each ingredient, only extract the name of the ingredient and remove any preparation instructions associated with them, such as details on how it should be prepared (e.g., chopped, diced) or its purpose (e.g., to make a soup).\n"
-        f"4. For each ingredient, standardize the quantity required into one of the following standardized units: teaspoon (tsp), tablespoon (tbsp), cup, fluid ounce (fl oz), milliliter (ml), liter (l), pint (pt), quart (qt), gallon (gal), gram (g), kilogram (kg), ounce (oz), pound (lb), piece, clove, slice, whole, bunch, head, stalk, stick, can, jar, dash, pinch, drop, splash, 'to taste'.\n"
-        f"5. For each extracted ingredient, identify the quantity required. If the quantity is a fraction (e.g., 1 and a half tablespoons), convert the quantity to a decimal format (e.g., 1.5 tbsp). Do not return special characters (like ½) to represent fractions; always use decimals.\n"
+        f"4. For each ingredient, standardize the unit type into one of the following standardized units:\n"
+        f"   - Volume: teaspoon (tsp), tablespoon (tbsp), cup, fluid ounce (fl oz), milliliter (ml), liter (l), pint (pt), quart (qt), gallon (gal).\n"
+        f"   - Weight: gram (g), kilogram (kg), ounce (oz), pound (lb).\n"
+        f"   - Count: piece, clove, slice, whole, bunch, head, stalk, stick, can, jar.\n"
+        f"   - Miscellaneous measurable units: dash, pinch, drop, splash.\n"
+        f"5. For immeasurable or qualitative units such as 'to taste', 'as needed', 'a handful', place these in the 'unittype' field, and set the 'quantity' field to null or leave it empty. If a standard measurable unit is used with a fraction or decimal value, ensure the quantity is converted to a decimal format (e.g., 1.5 instead of fractions like ½).\n"
         f"6. Handle singular and plural forms consistently (e.g., 'clove' and 'cloves' should be standardized as 'clove').\n"
         f"7. Categorize each ingredient into one of the following shopping aisles and label it accordingly:\n"
         f"---list starts here---\n"
@@ -62,9 +66,9 @@ def send_recipe_to_openai(file_path, disable_streaming=None, return_json_filepat
         f"{{\n"
         f"  \"recipeName\": \"Example Recipe Name\",\n"
         f"  \"ingredients\": [\n"
-        f"    {{ \"quantity\": \"X unit(s)\", \"ingredient\": \"Ingredient 1\", \"aisle\": \"Aisle Name\" }},\n"
-        f"    {{ \"quantity\": \"X unit(s)\", \"ingredient\": \"Ingredient 2\", \"aisle\": \"Aisle Name\" }},\n"
-        f"    {{ \"quantity\": \"X unit(s)\", \"ingredient\": \"Ingredient 3\", \"aisle\": \"Aisle Name\" }}\n"
+        f"    {{ \"quantity\": \"X\", \"unittype\": \"unit(s)\", \"ingredient\": \"Ingredient 1\", \"aisle\": \"Aisle Name\" }},\n"
+        f"    {{ \"quantity\": \"null\", \"unittype\": \"to taste\", \"ingredient\": \"Ingredient 2\", \"aisle\": \"Aisle Name\" }},\n"
+        f"    {{ \"quantity\": \"X\", \"unittype\": \"unit(s)\", \"ingredient\": \"Ingredient 3\", \"aisle\": \"Aisle Name\" }}\n"
         f"  ]\n"
         f"}}\n"
         f"[JSON_END]\n\n"
@@ -127,6 +131,10 @@ def send_recipe_to_openai(file_path, disable_streaming=None, return_json_filepat
     if not result_json.get('recipeName') or result_json['recipeName'] == "{{recipe_name_from_filename}}":
         result_json['recipeName'] = recipe_name_from_filename
 
+    # Assign sequential IDs to each ingredient
+    for index, ingredient in enumerate(result_json.get('ingredients', []), start=1):
+        ingredient['ID'] = index
+
     # Define the path for saving the JSON file in the same folder as the source file
     source_directory = os.path.dirname(file_path)
     json_file_name = os.path.splitext(filename)[0] + '.json'
@@ -143,10 +151,3 @@ def send_recipe_to_openai(file_path, disable_streaming=None, return_json_filepat
         return json_file_path
 
     return None
-
-# Example usage:
-# To use streaming:
-# send_recipe_to_openai('/path/to/your/file.html', disable_streaming=True)
-
-# To disable streaming and return JSON file path:
-# json_path = send_recipe_to_openai('/path/to/your/file.html', disable_streaming=True, return_filepath=True)

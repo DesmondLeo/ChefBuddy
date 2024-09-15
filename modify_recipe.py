@@ -1,13 +1,18 @@
 import json
 import re
 
-def modify_recipe(file_path):
+def modify_recipe(file_path, operation=None, ingredient_id=None, quantity=None, unittype=None, ingredient_name=None):
     """
-    Modify the JSON file of a recipe's ingredients based on user input in a single command.
-    
+    Modify the JSON file of a recipe's ingredients based on user input or provided arguments.
+
     Args:
         file_path (str): The file path to the JSON file containing recipe ingredients.
-        
+        operation (str, optional): The operation to perform ('ADD', 'DELETE', 'MODIFY').
+        ingredient_id (int, optional): The ID of the ingredient to delete or modify.
+        quantity (str, optional): The quantity for adding or modifying an ingredient.
+        unittype (str, optional): The unit type for adding or modifying an ingredient.
+        ingredient_name (str, optional): The name of the ingredient to add or modify.
+
     Returns:
         None: The function updates the JSON file directly.
     """
@@ -21,63 +26,96 @@ def modify_recipe(file_path):
     # Helper function to display the ingredients
     def display_ingredients(ingredients):
         print("\nCurrent Ingredients:")
-        for i, ingredient in enumerate(ingredients, start=1):
-            print(f"{i}. {ingredient['ingredient']}: {ingredient['quantity']}")
+        for ingredient in ingredients:
+            quantity_display = ingredient['quantity'] if ingredient['quantity'] is not None else ''
+            unit_display = ingredient['unittype'] if ingredient['unittype'] is not None else ''
+            print(f"ID {ingredient['ID']} - {ingredient['ingredient']}: {quantity_display} {unit_display}")
     
-    display_ingredients(ingredients)
+    def add_ingredient(ingredient_name, quantity, unittype):
+        new_id = max([ingredient['ID'] for ingredient in ingredients], default=0) + 1
+        ingredients.append({
+            'ID': new_id, 
+            'ingredient': ingredient_name, 
+            'quantity': quantity, 
+            'unittype': unittype
+        })
+        display_ingredients(ingredients)
+
+    def delete_ingredient(ingredient_id):
+        nonlocal ingredients
+        ingredients = [ingredient for ingredient in ingredients if ingredient['ID'] != ingredient_id]
+        display_ingredients(ingredients)
     
-    # Instructions for modifying the recipe
-    print("\n\nDo you want to modify this recipe? If so, use the following commands to edit this recipe:")
-    print(">> Delete \"{INGREDIENT_NAME}\"")
-    print(">> Change \"{INGREDIENT_NAME}\" to \"{QUANTITY}\"")
-    print(">> Add \"{INGREDIENT_NAME}\" Quantity \"{QUANTITY}\"")
-    print("Enter 'Done' when finished.")
-    
-    while True:
-        command = input("\n\nEnter the modification you would like to make or type 'Done' to exit: ").strip()
-        
-        if command.lower() == 'done':
-            break
-        
-        # Regex patterns to match commands with ingredients and quantities in quotes
-        delete_pattern = r'^delete\s+"([^"]+)"$'
-        change_pattern = r'^change\s+"([^"]+)"\s+to\s+"([^"]+)"$'
-        add_pattern = r'^add\s+"([^"]+)"\s+quantity\s+"([^"]+)"$'
-        
-        # Parse commands for delete, change, add
-        delete_match = re.match(delete_pattern, command, re.IGNORECASE)
-        change_match = re.match(change_pattern, command, re.IGNORECASE)
-        add_match = re.match(add_pattern, command, re.IGNORECASE)
-        
-        if delete_match:
-            # Extract ingredient name to delete
-            ingredient_name = delete_match.group(1)
-            ingredients = [ingredient for ingredient in ingredients if ingredient['ingredient'].lower() != ingredient_name.lower()]
-            display_ingredients(ingredients)
-        
-        elif change_match:
-            # Extract ingredient name and new quantity to change
-            ingredient_name = change_match.group(1)
-            new_quantity = change_match.group(2)
-            
-            # Find and update the ingredient's quantity
-            for ingredient in ingredients:
-                if ingredient['ingredient'].lower() == ingredient_name.lower():
+    def modify_ingredient(ingredient_id, new_quantity=None, new_unittype=None, new_ingredient_name=None):
+        for ingredient in ingredients:
+            if ingredient['ID'] == ingredient_id:
+                if new_quantity is not None:
                     ingredient['quantity'] = new_quantity
-                    break
-            else:
-                print(f"Ingredient '{ingredient_name}' not found.")
-            display_ingredients(ingredients)
-        
-        elif add_match:
-            # Extract ingredient name and quantity to add
-            new_ingredient = add_match.group(1)
-            new_quantity = add_match.group(2)
-            ingredients.append({'ingredient': new_ingredient, 'quantity': new_quantity})
-            display_ingredients(ingredients)
-        
+                if new_unittype is not None:
+                    ingredient['unittype'] = new_unittype
+                if new_ingredient_name is not None:
+                    ingredient['ingredient'] = new_ingredient_name
+                break
         else:
-            print("Invalid command. Please use 'Delete \"{INGREDIENT_NAME}\"', 'Change \"{INGREDIENT_NAME}\" to \"{QUANTITY}\"', or 'Add \"{INGREDIENT_NAME}\" Quantity \"{QUANTITY}\"'.")
+            print(f"Ingredient with ID {ingredient_id} not found.")
+        display_ingredients(ingredients)
+    
+    # Handle passed arguments for direct modification
+    if operation:
+        operation = operation.lower()
+        if operation == 'add' and ingredient_name and (quantity is not None or unittype is not None):
+            add_ingredient(ingredient_name, quantity, unittype)
+        elif operation == 'delete' and ingredient_id is not None:
+            delete_ingredient(ingredient_id)
+        elif operation == 'modify' and ingredient_id is not None:
+            modify_ingredient(ingredient_id, quantity, unittype, ingredient_name)
+        else:
+            print("Invalid arguments provided for operation.")
+    else:
+        # Interactive mode if no arguments are passed
+        while True:
+            display_ingredients(ingredients)
+            print("\nAvailable commands:")
+            print(">> Add --ingredient \"{INGREDIENT_NAME}\" --quantity \"{QUANTITY}\" --unit \"{UNITTYPE}\"")
+            print(">> Modify --id {ID} [--quantity \"{QUANTITY}\"] [--unit \"{UNITTYPE}\"] [--ingredient \"{INGREDIENT_NAME}\"]")
+            print("   You can modify any combination of fields for the Modify command.")
+            print(">> Delete --id {ID}")
+            print("Enter 'Done' when finished.\n")
+            
+            command = input("Enter your command: ").strip()
+            
+            # Check for 'Done' command explicitly
+            if command.lower() == 'done':
+                break
+            
+            # Refined regex patterns to match commands with IDs and optional fields
+            delete_pattern = r'^delete\s+--id\s+(\d+)$'
+            modify_pattern = r'^modify\s+--id\s+(\d+)(?:\s+--quantity\s+"([^"]*)")?(?:\s+--unit\s+"([^"]*)")?(?:\s+--ingredient\s+"([^"]*)")?$'
+            add_pattern = r'^add\s+--ingredient\s+"([^"]+)"(?:\s+--quantity\s+"([^"]*)")?(?:\s+--unit\s+"([^"]*)")?$'
+            
+            # Parse commands for delete, modify, add
+            delete_match = re.match(delete_pattern, command, re.IGNORECASE)
+            modify_match = re.match(modify_pattern, command, re.IGNORECASE)
+            add_match = re.match(add_pattern, command, re.IGNORECASE)
+            
+            if delete_match:
+                delete_ingredient(int(delete_match.group(1)))
+            
+            elif modify_match:
+                ingredient_id = int(modify_match.group(1))
+                new_quantity = modify_match.group(2)
+                new_unittype = modify_match.group(3)
+                new_ingredient_name = modify_match.group(4)
+                modify_ingredient(ingredient_id, new_quantity, new_unittype, new_ingredient_name)
+            
+            elif add_match:
+                ingredient_name = add_match.group(1)
+                new_quantity = add_match.group(2)
+                new_unittype = add_match.group(3)
+                add_ingredient(ingredient_name, new_quantity, new_unittype)
+            
+            else:
+                print("Invalid command format. Please follow the instructions above.")
     
     # Update the original recipe JSON with the modified ingredients
     recipe_json['ingredients'] = ingredients
@@ -88,9 +126,8 @@ def modify_recipe(file_path):
     
     print("\nRecipe updated successfully.")
 
-# Example usage
-# Assuming the file path to the JSON file is 'recipe.json'
-# file_path = 'recipe.json'
-
-# Modify the recipe stored in the JSON file
-# modify_recipe(file_path)
+# Example usage:
+# Modify the recipe stored in the JSON file programmatically:
+# modify_recipe('recipe.json', 'ADD', ingredient_name='Sugar', quantity='2', unittype='cups')
+# modify_recipe('recipe.json', 'DELETE', ingredient_id=2)
+# modify_recipe('recipe.json', 'MODIFY', ingredient_id=3, quantity='1', unittype='liter', ingredient_name='Milk')
