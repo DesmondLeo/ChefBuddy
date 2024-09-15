@@ -4,6 +4,12 @@ import os
 import cv2
 import numpy as np
 
+def adjust_contrast(gray_image):
+    alpha = 1.5  # Contrast control (1.0-3.0). Adjust as needed.
+    beta = 0     # Brightness control (0-100). Adjust as needed.
+    adjusted = cv2.convertScaleAbs(gray_image, alpha=alpha, beta=beta)
+    return adjusted
+
 def preprocess_image(image_path):
     # Load the image using OpenCV
     img = cv2.imread(image_path)
@@ -15,16 +21,25 @@ def preprocess_image(image_path):
     # Convert to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
+    # Adjust contrast
+    gray = adjust_contrast(gray)
+    # Optionally save the image for debugging
+    # cv2.imwrite('gray_contrast.png', gray)
+
     # Apply adaptive thresholding to binarize the image
     binary = cv2.adaptiveThreshold(
         gray, 255, 
         cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
         cv2.THRESH_BINARY, 
-        11, 2
+        15, 3  # Adjusted parameters
     )
+    # Optionally save the image for debugging
+    # cv2.imwrite('binary.png', binary)
 
     # Remove noise by applying median blur
     denoised = cv2.medianBlur(binary, 3)
+    # Optionally save the image for debugging
+    # cv2.imwrite('denoised.png', denoised)
 
     # Return the processed image in PIL format
     return Image.fromarray(denoised)
@@ -73,4 +88,4 @@ def scrape_text_from_image(image_path):
         return None  # Return None in case of an error
 
 # Example usage:
-#scrape_text_from_image('/Users/michelleleo/Desktop/recipe photos/middle_eastern_mac_n_cheese_with_zaatar_pesto.jpeg')
+# scrape_text_from_image('/path/to/your/image.jpg')
