@@ -1,15 +1,50 @@
 import pytesseract
 from PIL import Image
 import os
+import cv2
+import numpy as np
+
+def preprocess_image(image_path):
+    # Load the image using OpenCV
+    img = cv2.imread(image_path)
+    
+    # Check if the image was loaded successfully
+    if img is None:
+        raise ValueError(f"Failed to load image from path: {image_path}. Please check the file format and path.")
+    
+    # Convert to grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Apply adaptive thresholding to binarize the image
+    binary = cv2.adaptiveThreshold(
+        gray, 255, 
+        cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+        cv2.THRESH_BINARY, 
+        11, 2
+    )
+
+    # Remove noise by applying median blur
+    denoised = cv2.medianBlur(binary, 3)
+
+    # Return the processed image in PIL format
+    return Image.fromarray(denoised)
 
 def scrape_text_from_image(image_path):
     try:
-        # Open the image
-        img = Image.open(image_path)
-        
-        # Extract text from the image using Tesseract
-        text = pytesseract.image_to_string(img)
-        
+        # Verify the image path exists
+        if not os.path.exists(image_path):
+            print(f"Image file not found at path: {image_path}")
+            return None
+
+        # Preprocess the image to improve OCR results
+        img = preprocess_image(image_path)
+
+        # Set Tesseract configuration for better accuracy
+        custom_config = r'--oem 3 --psm 6'
+
+        # Extract text from the image using Tesseract with custom configuration
+        text = pytesseract.image_to_string(img, config=custom_config)
+
         # Get the root directory of the application (the directory where this script is located)
         root_directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -38,4 +73,4 @@ def scrape_text_from_image(image_path):
         return None  # Return None in case of an error
 
 # Example usage:
-# scrape_text_from_image('/path/to/your/image.png')
+#scrape_text_from_image('/Users/michelleleo/Desktop/recipe photos/middle_eastern_mac_n_cheese_with_zaatar_pesto.jpeg')
