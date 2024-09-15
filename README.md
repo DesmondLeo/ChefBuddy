@@ -21,7 +21,9 @@ Currently this is a work-in-progress POC.  It works - though like all things it 
 - `pytesseract`
 - `Pillow` (for `Image`)
 - `python-dotenv` (for `dotenv`)
-- `anthropic` 
+- `anthropic`
+- `opencv-python` (for `cv2`)
+- `numpy`
 
 # OpenAI Notes
 
