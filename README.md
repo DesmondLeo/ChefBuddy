@@ -43,9 +43,20 @@ Future improvements to the application will likely also surpass the rate-per-min
 
 4. **Follow the instructions in the terminal, and that's it!**
 
-> 📝 **Note 1:**  
+> 📝 **Note 1a: using images**  
 > If you're taking an image of a recipe to use with this app, make sure the image filename matches the recipe name, using underscores to separate words.  
 >  
+> **Example:**  
+> For a recipe named "Cacio e Pepe," name the image file `cacio_e_pepe.jpg`.  
+>  
+> The program will automatically remove the underscores and format the recipe name accordingly.
+
+> 📝 **Note 1b: using images**  
+> make sure the image is as flat as possible.  ingredient lists near the spine of a book will have text that appears slightly curved.   
+> I've tried various free tools from easyOCR to various PSM values with pytesseract and none of them work to properly identify the ingredients.  
+> The best solution is to just have a flat image for best results.
+> to improve results even better, try to isolate the ingredients in the image.
+
 > **Example:**  
 > For a recipe named "Cacio e Pepe," name the image file `cacio_e_pepe.jpg`.  
 >  
@@ -60,7 +71,7 @@ Future improvements to the application will likely also surpass the rate-per-min
 
 # Next Improvements for MVP Release
 
-- enhance prompt to remove redundancies and minor LLM response inconsistencies
+- ~~enhance prompt to remove redundancies and minor LLM response inconsistencies~~
 - ~~allow for recipe adjustments / portion size adjustements~~
 - Developing a GUI / Webapp using Bubble.io
 

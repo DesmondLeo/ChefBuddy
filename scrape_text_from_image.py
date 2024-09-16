@@ -55,7 +55,7 @@ def scrape_text_from_image(image_path):
         img = preprocess_image(image_path)
 
         # Set Tesseract configuration for better accuracy
-        custom_config = r'--oem 3 --psm 6'
+        custom_config = r'--oem 3 --psm 3'
 
         # Extract text from the image using Tesseract with custom configuration
         text = pytesseract.image_to_string(img, config=custom_config)
