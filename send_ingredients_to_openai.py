@@ -20,6 +20,25 @@ def send_ingredients_list_to_openai(input_file_path, api_key):
         "Your task is to create a final shopping list that sums up the quantities "
         "of identical ingredients and organizes them by aisle. The result should be a single list where each ingredient "
         "appears only once with its total quantity, and the ingredients are grouped by aisle.\n\n"
+        "If any ingredient has \"aisle\": \"Unknown\", use the following aisles list from the initial step to correctly categorize the ingredient:\n"
+        "---list starts here---\n"
+        "Produce\n"
+        "Fresh meats\n"
+        "Cooked Meats\n"
+        "Milk/Butter/Cream/Cheese/Yoghurts\n"
+        "Eggs/Sugar/Bread/Baking goods\n"
+        "Oil/Jam/Tinned fruit/Honey/Spices/Stock\n"
+        "Sauces/Mayonnaise/Pickles/Rice/Pulses\n"
+        "Tinned Foods/Pasta/Soups\n"
+        "Dried fruits, seeds & nuts\n"
+        "Coffee/Cereal\n"
+        "Biscuits/Chocolate/Sweets/Tea\n"
+        "Fizzy drinks/Crackers/Nuts/Crisps\n"
+        "Cordials/Bottled water\n"
+        "Wine/Beer/Cider\n"
+        "Other\n"
+        "---list ends here---\n\n"
+        "If the correct aisle cannot be confidently determined, categorize it as 'Other'.\n\n"
         "It is **critical** that you return the output **only** between the markers [JSON_START] and [JSON_END]. "
         "Make sure the output is enclosed in these exact markers.\n\n"
         "Please return the final list in the following JSON format, organized by aisle:\n"
@@ -38,6 +57,7 @@ def send_ingredients_list_to_openai(input_file_path, api_key):
         "[JSON_END]\n\n"
         "Below is the list of ingredients:\n\n"
     )
+
 
     # Convert the input data to a string to append to the prompt
     ingredient_list = json.dumps(input_data, indent=4)

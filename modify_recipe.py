@@ -35,10 +35,11 @@ def modify_recipe(file_path, operation=None, ingredient_id=None, quantity=None, 
     def add_ingredient(ingredient_name, quantity, unittype):
         new_id = max([ingredient['ID'] for ingredient in ingredients], default=0) + 1
         ingredients.append({
-            'ID': new_id, 
             'ingredient': ingredient_name, 
             'quantity': quantity, 
-            'unittype': unittype
+            'unittype': unittype,
+            "aisle": "Unknown",
+            'ID': new_id
         })
         display_ingredients(ingredients)
 

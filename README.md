@@ -43,24 +43,16 @@ Future improvements to the application will likely also surpass the rate-per-min
 
 4. **Follow the instructions in the terminal, and that's it!**
 
-> 📝 **Note 1a: using images**  
-> If you're taking an image of a recipe to use with this app, make sure the image filename matches the recipe name, using underscores to separate words.  
+> 📝 **Note 1a: Images: file naming conventions**  
+> If you're taking an image of a recipe to use with this code, make sure the image filename matches the recipe name, using underscores to separate words.  
 >  
 > **Example:**  
 > For a recipe named "Cacio e Pepe," name the image file `cacio_e_pepe.jpg`.  
 >  
 > The program will automatically remove the underscores and format the recipe name accordingly.
 
-> 📝 **Note 1b: using images**  
-> make sure the image is as flat as possible.  ingredient lists near the spine of a book will have text that appears slightly curved.   
-> I've tried various free tools from easyOCR to various PSM values with pytesseract and none of them work to properly identify the ingredients.  
-> The best solution is to just have a flat image for best results.
-> to improve results even better, try to isolate the ingredients in the image.
-
-> **Example:**  
-> For a recipe named "Cacio e Pepe," name the image file `cacio_e_pepe.jpg`.  
->  
-> The program will automatically remove the underscores and format the recipe name accordingly.
+> 📝 **Note 1b: Image: image quality**  
+> make sure the image is as flat as possible.  ingredient lists near the spine of a book tend to have slightly curved text which confuses text recognition software.  I've tried various techniques including using deep-learning algorithms like easyOCR or modifying PSM values with pytesseract and none of them work to properly identify the ingredients.  This means the best solution for now is to just have a flat image for best results and to improve results even better, try to isolate the ingredients in the image.
 
 > 🌐 **Note 2:**  
 > When providing an HTML link, ensure you include the entire address, including the protocol (`http://` or `https://`).  
