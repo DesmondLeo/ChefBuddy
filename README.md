@@ -51,7 +51,7 @@ Future improvements to the application will likely also surpass the rate-per-min
 >  
 > The program will automatically remove the underscores and format the recipe name accordingly.
 
-> 📝 **Note 1b: Image: image quality**  
+> 📝 **Note 1b: Images: Watch out for spine curves**  
 > make sure the image is as flat as possible.  ingredient lists near the spine of a book tend to have slightly curved text which confuses text recognition software.  I've tried various techniques including using deep-learning algorithms like easyOCR or modifying PSM values with pytesseract and none of them work to properly identify the ingredients.  This means the best solution for now is to just have a flat image for best results and to improve results even better, try to isolate the ingredients in the image.
 
 > 🌐 **Note 2:**  
