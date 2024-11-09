@@ -1,14 +1,13 @@
 import os
 import json
 import re
-import openai
+from openai import OpenAI
 from dotenv import load_dotenv
 
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 def send_ingredients_list_to_openai(input_file_path, api_key):
     # Set the OpenAI API key
-
-    openai.api_key = os.getenv('OPENAI_API_KEY')
 
     # Read the input JSON file
     with open(input_file_path, 'r', encoding='utf-8') as file:
@@ -64,7 +63,7 @@ def send_ingredients_list_to_openai(input_file_path, api_key):
     final_prompt = base_prompt + ingredient_list
 
     # Call OpenAI's API with streaming enabled
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4",
         messages=[
             {"role": "system", "content": "You are chef's assistant and are responsible for creating a single, organized shopping lists from a list of ingredients listed for multiple recipes."},
@@ -77,9 +76,17 @@ def send_ingredients_list_to_openai(input_file_path, api_key):
     full_response = ""
     print("\nStreaming Response:")
     for chunk in response:
-        chunk_text = chunk['choices'][0]['delta'].get('content', '')
+        try:
+            # Ensure we are accessing a dictionary or object with 'content' attribute
+            chunk_delta = chunk.choices[0].delta
+            chunk_text = chunk_delta.content if hasattr(chunk_delta, 'content') else ''
+        except (KeyError, AttributeError) as e:
+            # Print the error to help diagnose any issues
+            print(f"Error accessing content in chunk: {e}")
+            chunk_text = ''
+
         print(chunk_text, end='')  # Print each chunk of text as it arrives
-        full_response += chunk_text
+        full_response += chunk_text if chunk_text is not None else ''
 
     print("\n\nFull response received.")
 

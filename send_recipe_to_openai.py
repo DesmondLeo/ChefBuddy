@@ -1,8 +1,10 @@
 import os
 import json
 import re
-import openai
+from openai import OpenAI
 from dotenv import load_dotenv
+
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 def send_recipe_to_openai(file_path, disable_streaming=None, return_json_filepath=False):
     """
@@ -16,8 +18,6 @@ def send_recipe_to_openai(file_path, disable_streaming=None, return_json_filepat
     Returns:
         str or None: Returns the JSON file path if return_json_filepath is True; otherwise, returns None.
     """
-
-    openai.api_key = os.getenv('OPENAI_API_KEY')
 
     # Determine file type and read content
     if file_path.endswith('.html') or file_path.endswith('.txt'):
@@ -80,7 +80,7 @@ def send_recipe_to_openai(file_path, disable_streaming=None, return_json_filepat
 
     if disable_streaming:
         # If disable_streaming is set, generate response without streaming
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a chef's bot assistant looking to extract ingredients from a recipe to create shopping list."},
@@ -90,11 +90,11 @@ def send_recipe_to_openai(file_path, disable_streaming=None, return_json_filepat
         )
 
         # Collect the full response
-        full_response = response['choices'][0]['message']['content']
+        full_response = response.choices[0].message.content
 
     else:
         # Stream the response as it is being generated
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a chef's bot assistant looking to extract ingredients from a recipe to create shopping list."},
@@ -106,9 +106,17 @@ def send_recipe_to_openai(file_path, disable_streaming=None, return_json_filepat
         # Stream the response as it is being generated
         full_response = ""
         for chunk in response:
-            chunk_text = chunk['choices'][0]['delta'].get('content', '')
+            try:
+                # Ensure we are accessing a dictionary or object with 'content' attribute
+                chunk_delta = chunk.choices[0].delta
+                chunk_text = chunk_delta.content if hasattr(chunk_delta, 'content') else ''
+            except (KeyError, AttributeError) as e:
+                # Print the error to help diagnose any issues
+                print(f"Error accessing content in chunk: {e}")
+                chunk_text = ''
+
             print(chunk_text, end='')  # Print each chunk of text as it arrives
-            full_response += chunk_text
+            full_response += chunk_text if chunk_text is not None else ''
 
         print("\n\nFull response received.")
 
